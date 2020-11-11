@@ -1,7 +1,9 @@
-#lang racket
+#lang rosette
 (require racket/list)
 (require rebellion/type/record)
 ; HOVALAAG Processor emulator
+
+(provide instr reg run run-output)
 
 ; define the instruction type: implicitly 32b
 (define-record-type instr (alu a b c d w f pc o io x k l))
@@ -66,7 +68,7 @@
     [0 (reg-a S)]
     [1 (ALU I S)]
     [2 (reg-d S)]
-    [3 (car (if (instr-io 0) (reg-in1 S) (reg-in2 S)))] ; read from io 1 or 2 depending on io flag
+    [3 (car (if (eq? (instr-io I) 0) (reg-in1 S) (reg-in2 S)))] ; read from io 1 or 2 depending on io flag
   )
 )
 
@@ -238,9 +240,14 @@
   )
 )
 
-
-(run
-  (list instr-swap instr-swap instr-swap)
-  (reg #:a 1 #:b 2 #:c 0 #:d 0 #:w 0 #:f 0 #:pc 0 #:in1 null #:in2 null)
-  2
+(define (run-output program initial-state cycles)
+  (define trace (run program initial-state cycles))
+  (car (list-ref trace 3))
 )
+
+
+; (run
+;   (list instr-swap instr-swap instr-swap)
+;   (reg #:a 1 #:b 2 #:c 0 #:d 0 #:w 0 #:f 0 #:pc 0 #:in1 null #:in2 null)
+;   2
+; )
